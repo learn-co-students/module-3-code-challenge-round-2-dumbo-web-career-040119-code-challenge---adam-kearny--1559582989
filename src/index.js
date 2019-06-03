@@ -21,11 +21,32 @@ document.addEventListener('DOMContentLoaded', () => {
   loadImage()
 })
 
+function deleteComment(event){
+
+  const button = event.target
+  const li = event.target.parentElement
+  const commentId = button.dataset.commentId
+
+  fetch(`https://randopic.herokuapp.com/comments/${commentId}`, {
+    method: "DELETE"
+  })
+    .then(res => res.json())
+    .then(comment => {
+      li.remove()
+    })
+
+}
+
 function addComment(){
   event.preventDefault()
   const comment = document.querySelector('#comment_input').value
   const newLi = document.createElement('li')
   newLi.innerText = comment
+
+  // const button = document.createElement('button')
+  // button.innerText = "delete me"
+  // newLi.appendChild(button)
+
   commentsUl.appendChild(newLi)
   document.querySelector('#comment_input').value = ""
 
@@ -39,7 +60,15 @@ function addComment(){
       image_id: imageId,
       content: comment
     })
-  })
+  }).then(res => res.json())
+    .then(comment => {
+      const button = document.createElement('button')
+      button.innerText = "delete me"
+      button.dataset.commentId = comment.id
+      button.addEventListener("click", deleteComment)
+      newLi.appendChild(button)
+
+    })
 }
 
 function increaseLikes(){
@@ -60,9 +89,16 @@ function increaseLikes(){
   })
 }
 
+
+
 function addCommentToUl(comment){
   const newLi = document.createElement('li')
   newLi.innerText = comment.content
+  const button = document.createElement('button')
+  button.innerText = "delete me"
+  button.dataset.commentId = comment.id
+  button.addEventListener("click", deleteComment)
+  newLi.appendChild(button)
   commentsUl.appendChild(newLi)
 }
 
